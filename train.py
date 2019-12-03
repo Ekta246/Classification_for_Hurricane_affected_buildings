@@ -41,6 +41,7 @@ print(trainloader.dataset.classes)
 tstart = datetime.now() #Start_calculating_time
 print('start time is', tstart)
 
+##torch.set_grad_enabled(False)
 # Enabling the GPU device to mount access to the pytorch on the device, In my case Cuda available GPU
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -162,5 +163,29 @@ delta = tend - tstart
 print('training time is', delta)
 torch.save(model.state_dict(), './paths/maria/Resnet_classifier_2.pth')
 print('model is saved')
+
+print(####################Freezing first 7 layers##########################)
+
+#When freezing layers you just need to change the auto_grad function in the model architecture
+'''model = models.resnet50(pretrained=True)
+ct = 0
+for child in model.children():
+    ct += 1
+    if ct < 7:
+        for param in child.parameters():
+            param.requires_grad = False
+    else:
+        for param in child.parameters():
+            param.requires_grad = True
+
+model.fc = nn.Sequential(nn.Linear(2048, 512),
+                                 nn.ReLU(),
+                                 #nn.Dropout(0.2),# add a batch Norm if you want
+                                 nn.Linear(512, 3),
+                                 nn.LogSoftmax(dim=1))
+for param in model.fc.parameters():
+    param.requires_grad = True
+    print(model.fc.parameters) 
+model = model.to(device)
 
 
